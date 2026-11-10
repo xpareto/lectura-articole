@@ -1,12 +1,12 @@
 var CACHE = 'lectura-articole-v1';
 var FILES = [
-  './',
-  './index.html',
-  './manifest.json',
-  './help.html' ,
-  './icon-192.png',
-  './icon-512.png'
+  '/lectura-articole/',
+  '/lectura-articole/index.html',
+  '/lectura-articole/manifest.json',
+  '/lectura-articole/icon-192.png',
+  '/lectura-articole/icon-512.png'
 ];
+
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
@@ -21,7 +21,7 @@ self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
-        keys.filter(function(k) { return k !== CACHE; 60
+        keys.filter(function(k) { return k !== CACHE; })
             .map(function(k) { return caches.delete(k); })
       );
     })
@@ -53,3 +53,5 @@ self.addEventListener('fetch', function(e) {
     })
   );
 });
+
+
