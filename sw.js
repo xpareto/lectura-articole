@@ -1,11 +1,12 @@
-var CACHE = 'lectura-articole-v1';
+var CACHE = 'lectura-articole-v2';
 var FILES = [
-  '/lectura-articole/',
-  '/lectura-articole/index.html',
-  '/lectura-articole/manifest.json',
-  '/lectura-articole/icon-192.png',
-  '/lectura-articole/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
+
 
 
 self.addEventListener('install', function(e) {
