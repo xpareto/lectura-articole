@@ -1,296 +1,333 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <title>Cookie check</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-      :root {
-        color-scheme: light dark;
-      }
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Citește clipboard v1</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b6e8a">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#f3f5f7;--fg:#14202b;--mut:#5b6b78;--card:#fff;--line:#d5dde3;--acc:#0b6e8a;--accfg:#fff;--stop:#b3372b;--hl:#ffe08a;--hlfg:#222;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171d;--fg:#e6edf2;--mut:#93a4b1;--card:#18222a;--line:#2b3a45;--acc:#4cb8d6;--accfg:#06232d;--stop:#e5675b;--hl:#7a5f00;--hlfg:#fff}}
+:root[data-theme="dark"]{--bg:#10171d;--fg:#e6edf2;--mut:#93a4b1;--card:#18222a;--line:#2b3a45;--acc:#4cb8d6;--accfg:#06232d;--stop:#e5675b;--hl:#7a5f00;--hlfg:#fff}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.55 "Segoe UI",Roboto,system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:1.3rem;margin:4px 0 12px}
+textarea,#view{width:100%;height:34vh;padding:12px;font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:10px}
+textarea{height:48px;min-height:48px;padding:10px 12px;resize:none;overflow:hidden;white-space:nowrap;margin-bottom:10px}
+#view{height:46vh;overflow-y:auto;overflow-wrap:anywhere}
+#view span{cursor:pointer;border-radius:4px;padding:1px 0}
+#view span.cur{background:var(--hl);color:var(--hlfg)}
+.row{display:flex;gap:10px;margin:12px 0}
+button{flex:1;min-height:56px;font:inherit;font-weight:600;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+button:active{transform:scale(.98)}
+#play{background:var(--acc);color:var(--accfg);border-color:var(--acc)}
+#stop{color:var(--stop);border-color:var(--stop)}
+label{display:block;color:var(--mut);font-size:.9rem;margin:10px 0 4px}
+input[type=range]{width:100%}
+[hidden]{display:none!important}
+#tabs button.on{background:var(--acc);color:var(--accfg);border-color:var(--acc)}
+#items{max-height:30vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+.it{display:flex;gap:8px;align-items:center;padding:6px 10px;border-bottom:1px solid var(--line)}
+.it .t{flex:1;min-width:0;overflow-wrap:anywhere;font-size:.92rem;cursor:pointer}
+.it.rd .t{opacity:.55}.it.now{background:var(--hl);color:var(--hlfg)}
+.it button{flex:none;min-height:36px;padding:0 10px}
+#helpbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px 14px;margin-bottom:12px;font-size:.92rem}
+#helpbox ol,#helpbox ul{padding-left:20px;margin:4px 0}
+#helpbox p{margin:8px 0 4px}
+#msg{min-height:1.5em;color:var(--mut);font-size:.92rem;margin-top:10px}
+</style>
+</head>
+<body>
+<main>
+<div class="row" style="align-items:center;margin:0 0 10px;gap:6px">
+<h1 style="flex:1;margin:0;font-size:1.1rem;min-width:0">Citește clipboard <small style="font-weight:400;color:var(--mut)">v1</small></h1>
+<button id="clear" type="button" style="flex:none;min-height:40px;padding:0 10px;font-size:.85rem" aria-label="Șterge textul">🗑 Șterge</button>
+<button id="help" type="button" style="flex:none;min-height:40px;padding:0 10px;font-size:.85rem" aria-expanded="false">? Help</button>
+</div>
+<div id="helpbox" hidden>
+<p><b>Ordinea de folosire</b></p>
+<ol>
+<li>Dacă mai ai un text vechi, apasă <b>🗑 Șterge text</b>. Altfel textul nou se adaugă la cel vechi.</li>
+<li>Apasă lung în caseta de sus și alege <b>Lipește</b>. Textul apare mai jos, pe propoziții.</li>
+<li>Poți lipi și un <b>link</b> către un articol: aplicația îl aduce și păstrează doar textul articolului, fără autor, dată, poze sau linkuri. Are nevoie de internet și funcționează doar în fișierul HTML deschis în Chrome, nu în varianta de pe link.</li>
+<li>Alege de unde începi: atingi o propoziție sau muți cursorul <b>Începe de la</b>.</li>
+<li>Alege <b>viteza</b>.</li>
+<li>Apasă <b>▶ Start</b>. <b>⏸ Pauză</b> oprește și reia de la propoziția curentă. <b>⏹ Stop</b> oprește și revine la început.</li>
+</ol>
+<p><b>Estimarea de pe ultimul rând</b></p>
+<ul>
+<li><b>Citire vizuală</b>: timpul cu citit normal, în gând, la circa 220 de cuvinte pe minut.</li>
+<li><b>Audio</b>: timpul cu vocea la viteza aleasă. La 1.0× vocea citește circa 155 de cuvinte pe minut, deci sub 1.4× e mai lentă decât citirea vizuală.</li>
+<li><b>Economie</b> / <b>Mai lent</b>: diferența dintre cele două, pentru tot textul.</li>
+<li><b>Rămas</b>: timpul audio de la propoziția curentă până la final.</li>
+</ul>
+<p>Sunt estimări orientative, care diferă puțin de la o voce la alta. Dacă nu se aude nimic, instalează vocea „Română" în Setări → Text-to-speech (Google).</p>
+</div>
+<div class="row" id="tabs" style="margin:0 0 10px"><button id="m1" type="button" class="on" style="min-height:44px">Text / Link</button><button id="m2" type="button" style="min-height:44px">Listă (0)</button></div>
+<textarea id="txt" rows="1" placeholder="Apasă lung aici → Lipește"></textarea>
+<div id="listbox" hidden>
+<div class="row" style="margin:0 0 8px"><button id="delread" type="button" style="min-height:40px;font-size:.85rem">Șterge citite</button><button id="delall" type="button" style="min-height:40px;font-size:.85rem">Șterge tot</button></div>
+<div id="items"></div>
+</div>
+<div id="view" hidden></div>
+<label for="pos">Începe de la: <span id="pv">–</span></label>
+<input id="pos" type="range" min="0" max="0" step="1" value="0">
+<div class="row">
+<button id="play" type="button">▶ Start</button>
+<button id="pause" type="button">⏸ Pauză</button>
+<button id="stop" type="button">⏹ Stop</button>
+</div>
+<label for="rate">Viteză: <span id="rv">1.0</span>×</label>
+<input id="rate" type="range" min="0.6" max="2" step="0.1" value="1">
+<div id="dur" style="margin-top:8px;font-weight:600">Citire vizuală: – · Audio: –</div>
+</main>
+<script>
+(function(){
+var synth=window.speechSynthesis;
+var $=function(id){return document.getElementById(id)};
+var txt=$('txt'),view=$('view'),pos=$('pos'),rate=$('rate');
+var chunks=[],spans=[],idx=0,token=0,state='idle',roVoice=null,wake=null,keep=null,mode=1,items=[],cur=-1,listRun=false;
+try{items=JSON.parse(localStorage.getItem('cc_list')||'[]')}catch(e){items=[]}
+function say(){}
+if(!synth){say('Browserul nu suportă citirea vocală.');return}
 
-      body {
-        font-family: 'Inter', Helvetica, Arial, sans-serif;
-        background: light-dark(#F8F8F7, #191919);
-        color: light-dark(#1f1f1f, #e3e3e3);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px;
-        text-align: center;
-      }
+function loadVoices(){
+  var all=synth.getVoices();
+  roVoice=all.filter(function(v){return /^ro/i.test(v.lang.replace('_','-'))})[0]||null;
+  if(!roVoice&&all.length)say('Nu există voce românească. Instalează „Română" în Setări → Text-to-speech (Google).');
+}
+loadVoices();synth.onvoiceschanged=loadVoices;
 
-      .container {
-        background: light-dark(#FFFFFF, #1F1F1F);
-        padding: 32px;
-        border-radius: 16px;
-        border: 1px solid light-dark(#E2E3E4, #3E3E3E);
-        max-width: min(80%, 500px);
-        width: 100%;
-        color: light-dark(#2B2D31, #D4D4D4);
-      }
+try{var s=localStorage.getItem('rate');if(s){rate.value=s;$('rv').textContent=Number(s).toFixed(1)}}catch(e){}
+rate.oninput=function(){setTimeout(dur,0);$('rv').textContent=Number(rate.value).toFixed(1);try{localStorage.setItem('rate',rate.value)}catch(e){}};
 
-      h1 {
-        font-size: 20px;
-        font-weight: 500;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-        color: light-dark(#2B2D31, #D4D4D4);
-      }
+function split(t){
+  var parts=t.replace(/\r/g,'').match(/[^.!?\n]+[.!?]*/g)||[];
+  var out=[],cur='';
+  parts.forEach(function(p){
+    p=p.trim();if(!p)return;
+    if((cur+' '+p).length>180&&cur){out.push(cur);cur=p}else cur=cur?cur+' '+p:p;
+  });
+  if(cur)out.push(cur);
+  return out;
+}
 
-      p {
-        font-size: 14px;
-        color: light-dark(#2B2D31, #D4D4D4);
-        line-height: 21px;
-        margin: 0 0 1.5rem 0;
-      }
+function render(t){
+  if(t===undefined)t=txt.value;t=t.trim();
+  chunks=split(t);spans=[];view.textContent='';
+  chunks.forEach(function(c,i){
+    var sp=document.createElement('span');sp.textContent=c+' ';
+    sp.onclick=function(){goTo(i,true)};
+    view.appendChild(sp);spans.push(sp);
+  });
+  idx=0;pos.max=Math.max(0,chunks.length-1);
+  view.hidden=!chunks.length;
+  mark();
+}
+function fmt(sec){sec=Math.round(sec);var m=Math.floor(sec/60),r=sec%60;return m?(m+' min '+r+' s'):(r+' s')}
+function dur(){
+  var r=Number(rate.value)||1,vis=220,tts=155;
+  function words(a){return a.reduce(function(n,c){return n+c.split(/\s+/).filter(Boolean).length},0)}
+  var el=$('dur');
+  if(!chunks.length){el.textContent='Citire vizuală: – · Audio: –';return}
+  var w=words(chunks),v=w/vis*60,t=w/tts*60/r,left=words(chunks.slice(idx))/tts*60/r,d=v-t;
+  el.textContent='Citire vizuală: '+fmt(v)+' · Audio '+r.toFixed(1)+'×: '+fmt(t)+' · '+
+    (d>=1?'Economie: '+fmt(d):d<=-1?'Mai lent cu: '+fmt(-d):'La fel')+' · Rămas audio: '+fmt(left);
+}
+function mark(){
+  dur();
+  spans.forEach(function(sp,i){sp.classList.toggle('cur',i===idx)});
+  pos.value=idx;
+  $('pv').textContent=chunks.length?('propoziția '+(idx+1)+' din '+chunks.length):'–';
+  if(spans[idx]){var sp=spans[idx];view.scrollTop=sp.offsetTop-view.offsetTop-view.clientHeight/3}
+}
+function goTo(i,restart){
+  idx=Math.max(0,Math.min(i,chunks.length-1));mark();
+  if(restart&&state==='playing'){token++;synth.cancel();speak()}
+}
+pos.oninput=function(){goTo(Number(pos.value),false)};
+pos.onchange=function(){goTo(Number(pos.value),true)};
 
-      .icon {
-        margin-bottom: 1rem;
-        line-height: 0;
-      }
+function silentWav(){
+  var n=8000,b=new Uint8Array(44+n),d=new DataView(b.buffer);
+  function w(o,str){for(var i=0;i<str.length;i++)b[o+i]=str.charCodeAt(i)}
+  w(0,'RIFF');d.setUint32(4,36+n,true);w(8,'WAVEfmt ');d.setUint32(16,16,true);d.setUint16(20,1,true);d.setUint16(22,1,true);
+  d.setUint32(24,8000,true);d.setUint32(28,8000,true);d.setUint16(32,1,true);d.setUint16(34,8,true);w(36,'data');d.setUint32(40,n,true);
+  for(var i=0;i<n;i++)b[44+i]=128;
+  return URL.createObjectURL(new Blob([b],{type:'audio/wav'}));
+}
+async function hold(){
+  try{if(navigator.wakeLock)wake=await navigator.wakeLock.request('screen')}catch(e){}
+  try{if(!keep){keep=new Audio(silentWav());keep.loop=true;keep.volume=0.05}keep.play().catch(function(){})}catch(e){}
+  try{if('mediaSession' in navigator){
+    navigator.mediaSession.metadata=new MediaMetadata({title:'Citește clipboard'});
+    navigator.mediaSession.setActionHandler('play',function(){pause()});
+    navigator.mediaSession.setActionHandler('pause',function(){pause()});
+    navigator.mediaSession.setActionHandler('stop',function(){stop()});
+  }}catch(e){}
+}
+function release(){
+  try{if(wake){wake.release();wake=null}}catch(e){}
+  try{if(keep)keep.pause()}catch(e){}
+}
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'&&state==='playing'){
+    if(navigator.wakeLock)navigator.wakeLock.request('screen').then(function(w){wake=w}).catch(function(){});
+    if(!synth.speaking){token++;speak()}
+  }
+});
 
-      .button-container {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 2rem;
-      }
+function speak(){
+  var my=token;
+  if(idx>=chunks.length){if(listRun){finishItem();return}state='idle';idx=0;mark();release();$('pause').textContent='⏸ Pauză';say('Gata.');return}
+  mark();
+  var u=new SpeechSynthesisUtterance(chunks[idx]);
+  if(roVoice){u.voice=roVoice;u.lang=roVoice.lang}else u.lang='ro-RO';
+  u.rate=Number(rate.value);
+  u.onend=function(){if(my!==token)return;idx++;speak()};
+  u.onerror=function(e){if(my!==token)return;if(e.error==='canceled'||e.error==='interrupted')return;idx++;speak()};
+  state='playing';say('Citesc…');
+  synth.speak(u);
+}
+function start(){
+  if(mode===2){startList();return}
+  if(!chunks.length)render();
+  if(!chunks.length){say('Nu e text de citit. Lipește ceva mai întâi.');return}
+  token++;synth.cancel();hold();speak();
+}
+function pause(){
+  if(state==='playing'){token++;synth.cancel();state='paused';$('pause').textContent='⏯ Reia';say('În pauză.')}
+  else if(state==='paused'){token++;$('pause').textContent='⏸ Pauză';speak()}
+}
+function stop(){token++;listRun=false;synth.cancel();state='idle';idx=0;mark();release();$('pause').textContent='⏸ Pauză';say('Oprit.')}
 
-      button {
-        background-color: light-dark(#fff, #323232);
-        color: light-dark(#2B2D31, #FCFCFC);
-        border: 1px solid light-dark(#E2E3E4, #3E3E3E);
-        border-radius: 12px;
-        padding: 8px 12px;
-        font-size: 14px;
-        line-height: 21px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        font-weight: 400;
-        font-family: 'Inter', Helvetica, Arial, sans-serif;
-        width: 100%;
-      }
-
-      button:hover {
-        background-color: light-dark(#EAEAEB, #424242);
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      /* Loading Spinner Animation */
-      .spinner {
-        margin: 0 auto 1.5rem auto;
-        width: 40px;
-        height: 40px;
-        border: 4px solid light-dark(#f0f0f0, #262626);
-        border-top: 4px solid light-dark(#076eff, #87a9ff); /* Blue color */
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      .logo {
-        border-radius: 10px;
-        display: block;
-        margin: 0 auto 2rem auto;
-      }
-
-      .logo.hidden {
-        display: none;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <img
-        class="logo"
-        src="https://www.gstatic.com/images/branding/productlogos/ai_studio/v1/web-512dp/logo_ai_studio_color_1x_web_512dp.png"
-        alt="AI Studio Logo"
-        width="256"
-        height="256"
-      />
-      <div class="spinner"></div>
-      <div id="error-ui" class="hidden">
-        <div class="icon">
-          <svg
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="48px"
-            height="48px"
-            fill="#D73A49"
-          >
-            <path
-              d="M12,2C6.486,2,2,6.486,2,12s4.486,10,10,10s10-4.486,10-10S17.514,2,12,2z M13,17h-2v-2h2V17z M13,13h-2V7h2V13z"
-            />
-          </svg>
-        </div>
-        <div id="stepOne" class="text-container">
-          <h1>Action required to load your app</h1>
-          <p>
-            It looks like your browser is blocking a required security cookie, which is common on
-            older versions of iOS and Safari.
-          </p>
-          <div class="button-container">
-            <button id="authInSeparateWindowButton" onclick="redirectToReturnUrl(true)">Authenticate in new window</button>
-          </div>
-        </div>
-        <div id="stepTwo" class="text-container hidden">
-          <h1>Action required to load your app</h1>
-          <p>
-            It looks like your browser is blocking a required security cookie, which is common on
-            older versions of iOS and Safari.
-          </p>
-          <div class="button-container">
-            <button id="interactButton" onclick="redirectToReturnUrl(false)">Close and continue</button>
-          </div>
-        </div>
-        <div id="stepThree" class="text-container hidden">
-          <h1>Almost there!</h1>
-          <p>
-            Grant permission for the required security cookie below.
-          </p>
-          <div class="button-container">
-            <button id="grantPermissionButton" onclick="grantStorageAccess()">Grant permission</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script>
-      const AUTH_FLOW_TEST_COOKIE_NAME = '__SECURE-aistudio_auth_flow_may_set_cookies';
-      const COOKIE_VALUE = 'true';
-
-      function getCookie(name) {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-          let cookie = cookies[i].trim();
-          if (cookie.startsWith(name + '=')) {
-            return cookie.substring(name.length + 1);
-          }
-        }
-        return null;
-      }
-
-      function setAuthFlowTestCookie() {
-        // Set the cookie's TTL to 1 minute. This is a short lived cookie because it is only used
-        // when the user does not have an auth token or their auth token needs to be reset.
-        // Making this cookie too long-lived allows the user to get into a state where they can't
-        // mint a new auth token.
-        document.cookie = `${AUTH_FLOW_TEST_COOKIE_NAME}=${COOKIE_VALUE}; Path=/; Secure; SameSite=None; Domain=${window.location.hostname}; Partitioned; Max-Age=60;`;
-      }
-
-      /**
-       * Returns true if the test cookie is set, false otherwise.
-       */
-      function authFlowTestCookieIsSet() {
-        return getCookie(AUTH_FLOW_TEST_COOKIE_NAME) === COOKIE_VALUE;
-      }
-
-      /**
-       * Redirects to the return url. If autoClose is true, then the return url will be opened in a
-       * new window, and it will be closed automatically when the page loads.
-       * Options:
-       *   storageAccessGranted: if true, appends __storage_access_granted=1 to
-       *   the return url so the Lua auth script can set the test cookie
-       *   server-side (needed for Safari/iOS where document.cookie is blocked).
-       */
-      async function redirectToReturnUrl(autoClose, storageAccessGranted = false) {
-        const initialReturnUrlStr = new URLSearchParams(window.location.search).get('return_url');
-        const returnUrl = initialReturnUrlStr ? new URL(initialReturnUrlStr) : null;
-
-        // Prevent potentially malicious URLs from being used
-        if (returnUrl.protocol.toLowerCase() === 'javascript:') {
-          console.error('Potentially malicious return URL blocked');
-          return;
-        }
-
-        if (storageAccessGranted) {
-          returnUrl.searchParams.set('__storage_access_granted', '1');
-        }
-
-        if (autoClose) {
-          returnUrl.searchParams.set('__auto_close', '1');
-          const url = new URL(window.location.href);
-          url.searchParams.set('return_url', returnUrl.toString());
-          // Land on the cookie check page first, so the user can interact with it before proceeding
-          // to the return url where cookies can be set.
-          window.open(url.toString(), '_blank');
-          const hasAccess = await document.hasStorageAccess();
-          document.querySelector('#stepOne').classList.add('hidden');
-          if (!hasAccess) {
-            document.querySelector('#stepThree').classList.remove('hidden');
-          } else {
-            window.location.reload();
-          }
-        } else {
-          window.location.href = returnUrl.toString();
-        }
-      }
-
-      /**
-       * Grants the browser permission to set cookies. If successful, then it redirects to the
-       * return url.
-       */
-      async function grantStorageAccess() {
-        try {
-          await document.requestStorageAccess();
-          // Recent Safari/iOS versions block document.cookie entirely in
-          // cross-site iframes, even after requestStorageAccess(). Only
-          // server-side Set-Cookie headers work. Signal to the Lua auth script
-          // via query param so it can set the test cookie server-side.
-          redirectToReturnUrl(false, /* storageAccessGranted= */ true);
-        } catch (err) {
-          console.log('error after button click: ', err);
-        }
-      }
-
-      /**
-       * Verifies that the browser can set cookies. If it can, then it redirects to the return url.
-       * If it can't, then it shows the error UI.
-       */
-      function verifyCanSetCookies() {
-        setAuthFlowTestCookie();
-        if (authFlowTestCookieIsSet()) {
-          // Check if we are on the auto-close flow, and if so show the interact button.
-          const returnUrl = new URLSearchParams(window.location.search).get('return_url');
-          const autoClose = new URL(returnUrl).searchParams.has('__auto_close');
-          if (autoClose) {
-            document.querySelector('#stepOne').classList.add('hidden');
-            document.querySelector('#stepTwo').classList.remove('hidden');
-          } else {
-            redirectToReturnUrl(false);
-            return;
-          }
-        }
-        // The cookie could not be set, so initiate the recovery flow.
-        document.querySelector('.logo').classList.add('hidden');
-        document.querySelector('.spinner').classList.add('hidden');
-        document.querySelector('#error-ui').classList.remove('hidden');
-      }
-
-      // Start the cookie verification process.
-      verifyCanSetCookies();
-    </script>
-  </body>
+function note(t){chunks=[];spans=[];view.textContent=t;view.hidden=false;pos.max=0;mark()}
+function clean(md){
+  var i=md.indexOf('Markdown Content:');if(i>=0)md=md.slice(i+17);
+  md=md.replace(/!\[[^\]]*\]\([^)]*\)/g,'')
+       .replace(/\[([^\]]*)\]\([^)]*\)/g,'$1')
+       .replace(/https?:\/\/\S+/g,'')
+       .replace(/[*_`>#|~]+/g,'');
+  var months='ianuarie|februarie|martie|aprilie|mai|iunie|iulie|august|septembrie|octombrie|noiembrie|decembrie|january|february|march|april|may|june|july|september|october|november|december';
+  var reDate=new RegExp('\\b\\d{1,2}[./-]\\d{1,2}[./-]\\d{2,4}\\b|\\b\\d{1,2}\\s+('+months+')\\b|\\b('+months+')\\s+\\d{1,2},?\\s+\\d{4}|\\b\\d{1,2}:\\d{2}\\b','i');
+  var reBy=/^(de|by|autor|autori|text|foto|sursa|sursă|redactor|publicat|actualizat|updated|published|editor|credit)\b\s*[:\-]?/i;
+  var reJunk=/(citește și|citeste si|vezi și|vezi si|distribuie|share|facebook|twitter|whatsapp|newsletter|abonează|abonează-te|cookie|comentarii|comments|related|read more|citește mai mult|urmărește|urmareste|înscrie|inscrie|toate drepturile|copyright|©|publicitate|advertisement|trimite|print|imprimă|tags?:|etichete)/i;
+  var out=[];
+  md.split('\n').forEach(function(l){
+    l=l.replace(/\s+/g,' ').trim();
+    if(!l||/^[-=_*\s.•·]+$/.test(l))return;
+    var w=l.split(' ').length;
+    if(w<=12&&reJunk.test(l))return;
+    if(w<=10&&reDate.test(l))return;
+    if(w<=10&&reBy.test(l))return;
+    if(w<4&&!/[.!?:"”]$/.test(l))return;
+    out.push(l);
+  });
+  return out.join('\n');
+}
+async function getText(u){
+  var ctl=new AbortController(),to=setTimeout(function(){ctl.abort()},30000),api='https://r.jina.ai/'+u;
+  try{
+    var r;
+    try{r=await fetch(api,{signal:ctl.signal,headers:{'X-Retain-Images':'none','X-Remove-Selector':'header, footer, nav, aside, form, figure'}})}
+    catch(e){if(e.name==='AbortError')throw e;r=await fetch(api,{signal:ctl.signal})}
+    if(!r.ok)throw new Error('http '+r.status);
+    var t=clean(await r.text());
+    if(t.length<80)throw new Error('gol');
+    return t;
+  }finally{clearTimeout(to)}
+}
+async function loadUrl(u){
+  note('Se încarcă articolul…');
+  var t;try{t=await getText(u)}catch(e){note('Nu am putut încărca linkul sau nu am găsit text de articol. Verifică internetul sau lipește textul.');return}
+  txt.value=t;render();
+}
+function save(){try{localStorage.setItem('cc_list',JSON.stringify(items))}catch(e){}}
+function addItem(u){
+  u=u.replace(/[)\].,;]+$/,'');
+  if(!items.some(function(it){return it.url===u})){items.push({url:u,title:'',read:false});save()}
+  renderList();
+}
+function renderList(){
+  var box=$('items');box.textContent='';
+  items.forEach(function(it,i){
+    var d=document.createElement('div');d.className='it'+(it.read?' rd':'')+(listRun&&i===cur?' now':'');
+    var t=document.createElement('span');t.className='t';
+    t.textContent=(it.read?'✓ ':it.err?'⚠ ':listRun&&i===cur?'▶ ':'')+(it.title||it.url.replace(/^https?:\/\/(www\.)?/,'').slice(0,70));
+    t.onclick=function(){startList(i)};
+    var x=document.createElement('button');x.type='button';x.textContent='✕';x.setAttribute('aria-label','Șterge din listă');
+    x.onclick=function(){if(listRun)stop();items.splice(i,1);save();renderList()};
+    d.appendChild(t);d.appendChild(x);box.appendChild(d);
+  });
+  if(!items.length)box.textContent='Lista e goală. Distribuie un link din Chrome sau din altă aplicație către „Citește clipboard”.';
+  $('m2').textContent='Listă ('+items.filter(function(it){return !it.read}).length+')';
+}
+function startList(from){
+  if(!items.length){note('Lista e goală.');return}
+  items.forEach(function(it){it.err=false});
+  var j=from!==undefined?from:items.findIndex(function(it){return !it.read});
+  if(j<0){note('Toate articolele sunt citite.');return}
+  listRun=true;token++;synth.cancel();hold();playItem(j);
+}
+async function playItem(i){
+  cur=i;state='loading';renderList();note('Se încarcă articolul…');
+  var my=token,t;
+  try{t=await getText(items[i].url)}catch(e){if(my!==token)return;items[i].err=true;save();renderList();playNext();return}
+  if(my!==token)return;
+  if(!items[i].title){items[i].title=t.split('\n')[0].slice(0,90);save()}
+  renderList();render(t);speak();
+}
+function playNext(){
+  for(var j=cur+1;j<items.length;j++)if(!items[j].read&&!items[j].err){playItem(j);return}
+  listRun=false;state='idle';release();$('pause').textContent='⏸ Pauză';renderList();note('Lista a fost citită.');
+}
+function finishItem(){if(items[cur]){items[cur].read=true;save()}renderList();playNext()}
+function setMode(m){
+  stop();mode=m;
+  $('m1').classList.toggle('on',m===1);$('m2').classList.toggle('on',m===2);
+  txt.hidden=m===2;$('listbox').hidden=m!==2;$('clear').hidden=m===2;
+  view.style.height=m===2?'28vh':'';
+  var v=txt.value.trim();
+  if(m===1&&v&&!/^https?:\/\/\S+$/i.test(v))render();else render('');
+  renderList();
+}
+var tm;
+txt.addEventListener('input',function(){
+  clearTimeout(tm);
+  tm=setTimeout(function(){
+    stop();
+    var v=txt.value.trim();
+    if(/^https?:\/\/\S+$/i.test(v)){loadUrl(v)}
+    else if(v){render()}
+    else{chunks=[];render()}
+  },300);
+});
+$('clear').onclick=function(){stop();clearTimeout(tm);txt.value='';chunks=[];render();txt.focus()};
+$('help').onclick=function(){var h=$('helpbox');h.hidden=!h.hidden;$('help').setAttribute('aria-expanded',String(!h.hidden))};
+$('m1').onclick=function(){setMode(1)};
+$('m2').onclick=function(){setMode(2)};
+$('delread').onclick=function(){if(listRun)stop();items=items.filter(function(it){return !it.read});save();renderList()};
+$('delall').onclick=function(){if(confirm('Ștergi toată lista?')){if(listRun)stop();items=[];save();renderList()}};
+$('play').onclick=start;
+$('pause').onclick=pause;
+$('stop').onclick=stop;
+window.addEventListener('pagehide',function(){synth.cancel()});
+renderList();
+(function(){
+  var q=new URLSearchParams(location.search);
+  if(!q.has('url')&&!q.has('text')&&!q.has('title'))return;
+  var m=[q.get('url'),q.get('text'),q.get('title')].join(' ').match(/https?:\/\/[^\s]+/);
+  try{history.replaceState(null,'',location.pathname)}catch(e){}
+  if(m){addItem(m[0]);setMode(2)}else if((q.get('text')||'').trim()){txt.value=q.get('text');setMode(1)}
+})();
+try{if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}
+})();
+</script>
+</body>
 </html>
