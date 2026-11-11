@@ -1,12 +1,13 @@
 {
-  "name": "Lectură articole",
-  "short_name": "Lectura-audio",
-  "description": "citește articole dela linkuri sau clipboard",
-  "start_url": "./",
+  "id": "lectura-audio-v4",
+  "name": "Lectură articole v4",
+  "short_name": "Lectură v4",
+  "description": "citește articole de la linkuri sau clipboard",
+  "start_url": "./?v=4",
   "scope": "./",
   "display": "standalone",
   "background_color": "#FFFFFF",
-  "theme_color": "#2563EB",
+  "theme_color": "#059669",
   "orientation": "any",
   "icons": [
     {

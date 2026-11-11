@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Citește clipboard v2 · Lectură articole</title>
+<title>Citește clipboard v4 · Lectură articole</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b6e8a">
+<meta name="theme-color" content="#059669">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
@@ -18,6 +18,7 @@
     --acc: #0b6e8a;
     --acc-hover: #085369;
     --accfg: #ffffff;
+    --green: #059669;
     --stop: #b3372b;
     --stop-bg: #fdf2f2;
     --hl: #ffe08a;
@@ -34,6 +35,7 @@
       --acc: #4cb8d6;
       --acc-hover: #38a5c2;
       --accfg: #06232d;
+      --green: #10b981;
       --stop: #e5675b;
       --stop-bg: #2d1818;
       --hl: #7a5f00;
@@ -97,14 +99,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .v2-badge {
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: rgba(11, 110, 138, 0.15);
-    color: var(--acc);
+  .v-badge-green {
+    display: inline-block;
+    background-color: #059669 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.8rem !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
     vertical-align: middle;
+    margin-left: 4px;
   }
   .header-actions {
     display: flex;
@@ -128,6 +134,49 @@
   }
   .btn-sm:hover { filter: brightness(0.97); }
   .btn-sm:active { transform: scale(0.97); }
+
+  /* Download Panel Directly on Screen */
+  .dl-panel {
+    background: var(--card);
+    border: 2px solid #059669;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    box-shadow: var(--card-shadow);
+  }
+  .dl-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #059669;
+  }
+  .dl-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+  .dl-btn {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: transform 0.1s, filter 0.15s;
+  }
+  .dl-btn:active { transform: scale(0.96); }
+  .dl-btn-green { background: #059669; color: #fff; }
+  .dl-btn-blue { background: #2563eb; color: #fff; }
+  .dl-btn-gray { background: #374151; color: #fff; }
 
   #helpbox {
     background: var(--card);
@@ -456,11 +505,11 @@
 <body>
 
 <main>
-  <!-- 1. Antet cu Titlu v2, Șterge și Help -->
+  <!-- 1. Antet cu Titlu v4 (Insignă Verde Mare), Șterge și Help -->
   <header>
     <div class="title-group">
       <div class="app-icon">▶</div>
-      <h1>Citește clipboard <span class="v2-badge">v2</span></h1>
+      <h1>Citește clipboard <span class="v-badge-green">v4</span></h1>
     </div>
     <div class="header-actions">
       <button id="clear" type="button" class="btn-sm" aria-label="Șterge textul">
@@ -472,9 +521,22 @@
     </div>
   </header>
 
+  <!-- Panou Descărcare Fișiere GitHub v4 -->
+  <div class="dl-panel">
+    <div class="dl-header">
+      <span>📥 Descarcă fișierele v4 pentru GitHub:</span>
+      <span style="font-size:0.7rem;color:var(--mut);">Gata de urcat pe pareto.github.io</span>
+    </div>
+    <div class="dl-grid">
+      <button id="btn-dl-index" type="button" class="dl-btn dl-btn-green" title="Descarcă index.html">1. index.html</button>
+      <button id="btn-dl-manifest" type="button" class="dl-btn dl-btn-blue" title="Descarcă manifest.json">2. manifest.json</button>
+      <button id="btn-dl-sw" type="button" class="dl-btn dl-btn-gray" title="Descarcă sw.js">3. sw.js</button>
+    </div>
+  </div>
+
   <!-- Help Accordion Box -->
   <div id="helpbox" hidden>
-    <h2>Instrucțiuni de utilizare (v2)</h2>
+    <h2>Instrucțiuni de utilizare (v4)</h2>
     <ol>
       <li><b>Text sau Link</b>: lipește un articol sau URL direct în casetă.</li>
       <li><b>Listă (linkuri și texte)</b>: poți partaja (Share) din Chrome, WhatsApp sau Notes atât linkuri cât și texte selectate direct în listă.</li>
@@ -698,7 +760,7 @@ async function hold(){
   try{if(navigator.wakeLock)wake=await navigator.wakeLock.request('screen')}catch(e){}
   try{if(!keep){keep=new Audio(silentWav());keep.loop=true;keep.volume=0.05}keep.play().catch(function(){})}catch(e){}
   try{if('mediaSession' in navigator){
-    navigator.mediaSession.metadata=new MediaMetadata({title:'Citește clipboard v2',artist:'Lectură Audio'});
+    navigator.mediaSession.metadata=new MediaMetadata({title:'Citește clipboard v4',artist:'Lectură Audio'});
     navigator.mediaSession.setActionHandler('play',function(){pause()});
     navigator.mediaSession.setActionHandler('pause',function(){pause()});
     navigator.mediaSession.setActionHandler('stop',function(){stop()});
@@ -909,6 +971,35 @@ $('pause').onclick=pause;
 $('skip').onclick=skip;
 $('stop').onclick=stop;
 window.addEventListener('pagehide',function(){synth.cancel()});
+
+// Download buttons functionality
+function saveLocal(filename, data, type){
+  var b=new Blob([data],{type:type});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+$('btn-dl-index').onclick=function(){
+  saveLocal('index.html', document.documentElement.outerHTML, 'text/html;charset=utf-8');
+};
+$('btn-dl-manifest').onclick=function(){
+  fetch('manifest.json').then(function(r){return r.text()}).then(function(t){
+    saveLocal('manifest.json', t, 'application/json;charset=utf-8');
+  }).catch(function(){
+    saveLocal('manifest.json', '{\\n  "id": "lectura-audio-v4",\\n  "name": "Lectură articole v4",\\n  "short_name": "Lectură v4",\\n  "start_url": "./?v=4",\\n  "scope": "./",\\n  "display": "standalone"\\n}', 'application/json');
+  });
+};
+$('btn-dl-sw').onclick=function(){
+  fetch('sw.js').then(function(r){return r.text()}).then(function(t){
+    saveLocal('sw.js', t, 'application/javascript;charset=utf-8');
+  }).catch(function(){
+    saveLocal('sw.js', 'var CACHE="lectura-articole-v4";', 'application/javascript');
+  });
+};
 
 renderList();
 render('');
