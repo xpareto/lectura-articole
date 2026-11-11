@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Citește clipboard v5 · Lectură articole</title>
-<link rel="manifest" href="manifest.json?v=5">
+<title>Citește clipboard v6 · Lectură articole</title>
+<link rel="manifest" href="manifest.json?v=6">
 <meta name="theme-color" content="#059669">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -505,11 +505,11 @@
 <body>
 
 <main>
-  <!-- 1. Antet cu Titlu v5 (Insignă Verde Mare), Șterge și Help -->
+  <!-- 1. Antet cu Titlu v6 (Insignă Verde Mare), Șterge și Help -->
   <header>
     <div class="title-group">
       <div class="app-icon">▶</div>
-      <h1>Citește clipboard <span class="v-badge-green">v5</span></h1>
+      <h1>Citește clipboard <span class="v-badge-green">v6</span></h1>
     </div>
     <div class="header-actions">
       <button id="clear" type="button" class="btn-sm" aria-label="Șterge textul">
@@ -521,10 +521,10 @@
     </div>
   </header>
 
-  <!-- Panou Descărcare Fișiere GitHub v5 -->
+  <!-- Panou Descărcare Fișiere GitHub v6 -->
   <div class="dl-panel">
     <div class="dl-header">
-      <span>📥 Descarcă fișierele v5 pentru GitHub:</span>
+      <span>📥 Descarcă fișierele v6 pentru GitHub:</span>
       <span style="font-size:0.7rem;color:var(--mut);">Gata de urcat pe pareto.github.io</span>
     </div>
     <div class="dl-grid">
@@ -536,7 +536,7 @@
 
   <!-- Help Accordion Box -->
   <div id="helpbox" hidden>
-    <h2>Instrucțiuni de utilizare (v5)</h2>
+    <h2>Instrucțiuni de utilizare (v6)</h2>
     <ol>
       <li><b>Text sau Link</b>: lipește un articol sau URL direct în casetă.</li>
       <li><b>Listă (linkuri și texte)</b>: poți partaja (Share) din Chrome, WhatsApp sau Notes atât linkuri cât și texte selectate direct în listă.</li>
@@ -760,7 +760,7 @@ async function hold(){
   try{if(navigator.wakeLock)wake=await navigator.wakeLock.request('screen')}catch(e){}
   try{if(!keep){keep=new Audio(silentWav());keep.loop=true;keep.volume=0.05}keep.play().catch(function(){})}catch(e){}
   try{if('mediaSession' in navigator){
-    navigator.mediaSession.metadata=new MediaMetadata({title:'Citește clipboard v5',artist:'Lectură Audio'});
+    navigator.mediaSession.metadata=new MediaMetadata({title:'Citește clipboard v6',artist:'Lectură Audio'});
     navigator.mediaSession.setActionHandler('play',function(){pause()});
     navigator.mediaSession.setActionHandler('pause',function(){pause()});
     navigator.mediaSession.setActionHandler('stop',function(){stop()});
@@ -984,7 +984,7 @@ function saveLocal(filename, data, type){
 }
 
 $('btn-dl-index').onclick=function(){
-  fetch(location.pathname.endsWith('lectura-v5.html') ? 'lectura-v5.html' : 'index.html')
+  fetch(location.pathname.endsWith('lectura-v6.html') ? 'lectura-v6.html' : 'index.html')
     .then(function(r){ return r.text(); })
     .then(function(t){
       saveLocal('index.html', t, 'text/html;charset=utf-8');
@@ -994,17 +994,17 @@ $('btn-dl-index').onclick=function(){
     });
 };
 $('btn-dl-manifest').onclick=function(){
-  fetch('manifest.json?v=5').then(function(r){return r.text()}).then(function(t){
+  fetch('manifest.json?v=6').then(function(r){return r.text()}).then(function(t){
     saveLocal('manifest.json', t, 'application/json;charset=utf-8');
   }).catch(function(){
-    saveLocal('manifest.json', '{\\n  "id": "lectura-audio-v5",\\n  "name": "Lectură articole v5",\\n  "short_name": "Lectură v5",\\n  "start_url": "./index.html?v=5",\\n  "scope": "./",\\n  "display": "standalone"\\n}', 'application/json');
+    saveLocal('manifest.json', '{\\n  "id": "lectura-audio-v6",\\n  "name": "Lectură articole v6",\\n  "short_name": "Lectură v6",\\n  "start_url": "./index.html?v=6",\\n  "scope": "./",\\n  "display": "standalone"\\n}', 'application/json');
   });
 };
 $('btn-dl-sw').onclick=function(){
-  fetch('sw.js?v=5').then(function(r){return r.text()}).then(function(t){
+  fetch('sw.js?v=6').then(function(r){return r.text()}).then(function(t){
     saveLocal('sw.js', t, 'application/javascript;charset=utf-8');
   }).catch(function(){
-    saveLocal('sw.js', 'var CACHE="lectura-articole-v5";', 'application/javascript');
+    saveLocal('sw.js', 'var CACHE="lectura-articole-v6";', 'application/javascript');
   });
 };
 
