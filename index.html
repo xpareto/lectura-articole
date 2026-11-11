@@ -8,74 +8,482 @@
 <meta name="theme-color" content="#0b6e8a">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<!-- Tailwind CSS pentru aspect identic cu Preview -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    darkMode: 'media',
-    theme: {
-      extend: {
-        colors: {
-          brand: '#0b6e8a',
-          brandHover: '#085369',
-          brandLight: '#4cb8d6'
-        }
-      }
+<style>
+  :root {
+    --bg: #f3f5f7;
+    --fg: #14202b;
+    --mut: #5b6b78;
+    --card: #ffffff;
+    --line: #d5dde3;
+    --acc: #0b6e8a;
+    --acc-hover: #085369;
+    --accfg: #ffffff;
+    --stop: #b3372b;
+    --stop-bg: #fdf2f2;
+    --hl: #ffe08a;
+    --hlfg: #222222;
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10171d;
+      --fg: #e6edf2;
+      --mut: #93a4b1;
+      --card: #18222a;
+      --line: #2b3a45;
+      --acc: #4cb8d6;
+      --acc-hover: #38a5c2;
+      --accfg: #06232d;
+      --stop: #e5675b;
+      --stop-bg: #2d1818;
+      --hl: #7a5f00;
+      --hlfg: #ffffff;
+      --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
   }
-</script>
-<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  .overflow-wrap-anywhere {
-    overflow-wrap: anywhere;
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  main {
+    width: 100%;
+    max-width: 640px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+  .title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .app-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--acc);
+    color: var(--accfg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .v2-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(11, 110, 138, 0.15);
+    color: var(--acc);
+    vertical-align: middle;
+  }
+  .header-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .btn-sm {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s;
+  }
+  .btn-sm:hover { filter: brightness(0.97); }
+  .btn-sm:active { transform: scale(0.97); }
+
+  #helpbox {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    font-size: 0.86rem;
+    box-shadow: var(--card-shadow);
+  }
+  #helpbox h2 {
+    font-size: 0.92rem;
+    color: var(--acc);
+    margin: 8px 0 4px;
+  }
+  #helpbox ol, #helpbox ul {
+    padding-left: 20px;
+    margin: 4px 0 8px;
+    color: var(--mut);
+    line-height: 1.45;
+  }
+  #helpbox li { margin-bottom: 4px; }
+
+  /* Tab Navigation */
+  #tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tab-btn {
+    min-height: 42px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--mut);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .tab-btn.on {
+    background: var(--acc);
+    color: var(--accfg);
+    border-color: var(--acc);
+    box-shadow: 0 2px 4px rgba(11, 110, 138, 0.2);
+  }
+
+  /* Control Panel (Immediately under tabs) */
+  .control-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: var(--card-shadow);
+  }
+  .main-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .ctrl-btn {
+    min-height: 52px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    transition: transform 0.1s, filter 0.15s;
+    user-select: none;
+  }
+  .ctrl-btn:active { transform: scale(0.96); }
+  .ctrl-btn.btn-play {
+    background: var(--acc);
+    color: var(--accfg);
+    border-color: var(--acc);
+    box-shadow: 0 2px 4px rgba(11, 110, 138, 0.25);
+  }
+  .ctrl-btn.btn-play:hover { filter: brightness(1.08); }
+  .ctrl-btn.btn-skip {
+    color: #b45309;
+    border-color: #fcd34d;
+    background: #fffbeb;
+  }
+  @media (prefers-color-scheme: dark) {
+    .ctrl-btn.btn-skip {
+      color: #fde68a;
+      border-color: #78350f;
+      background: #2b1d0c;
+    }
+  }
+  .ctrl-btn.btn-stop {
+    color: var(--stop);
+    border-color: #fca5a5;
+    background: var(--stop-bg);
+  }
+
+  /* Sliders & Presets */
+  .setting-row {
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+  .setting-row + .setting-row { margin-top: 8px; }
+  .setting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--mut);
+    margin-bottom: 6px;
+  }
+  .val-highlight {
+    font-weight: 700;
+    color: var(--acc);
+    font-size: 0.85rem;
+  }
+  .preset-row {
+    display: flex;
+    gap: 4px;
+  }
+  .preset-pill {
+    padding: 2px 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--mut);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .preset-pill.active {
+    background: var(--acc);
+    color: var(--accfg);
+    border-color: var(--acc);
   }
   input[type=range] {
-    accent-color: #0b6e8a;
+    width: 100%;
+    accent-color: var(--acc);
+    cursor: pointer;
   }
+
+  /* Input Textarea */
+  #txt {
+    width: 100%;
+    height: 48px;
+    min-height: 48px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    font: inherit;
+    font-size: 0.9rem;
+    resize: none;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: 10px;
+    box-shadow: var(--card-shadow);
+  }
+  #txt:focus {
+    outline: 2px solid var(--acc);
+    outline-offset: 1px;
+  }
+
+  /* List Container */
+  #listbox {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    box-shadow: var(--card-shadow);
+  }
+  .list-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--mut);
+  }
+  .list-actions { display: flex; gap: 6px; }
+  .list-actions button {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--mut);
+    cursor: pointer;
+  }
+  #items {
+    max-height: 26vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    font-size: 0.85rem;
+    transition: background 0.15s;
+  }
+  .list-item.now {
+    background: var(--hl);
+    color: var(--hlfg);
+    border-color: #f59e0b;
+    font-weight: 600;
+  }
+  .list-item.rd {
+    opacity: 0.55;
+    background: var(--bg);
+    border-color: transparent;
+  }
+  .list-item-title {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .badge-tag {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--mut);
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-left: auto;
+  }
+  .del-item {
+    background: none;
+    border: none;
+    color: var(--mut);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .del-item:hover { color: var(--stop); }
+
+  /* Sentence View */
+  #view {
+    width: 100%;
+    height: 32vh;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    margin-bottom: 10px;
+    box-shadow: var(--card-shadow);
+  }
+  #view span {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px 2px;
+    transition: background 0.1s;
+  }
+  #view span:hover { background: rgba(0, 0, 0, 0.05); }
+  #view span.cur {
+    background: var(--hl);
+    color: var(--hlfg);
+    font-weight: 600;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
+  }
+
+  /* Duration & Message */
+  footer {
+    font-size: 0.78rem;
+    color: var(--mut);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #dur {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--line);
+    font-weight: 500;
+  }
+  #msg {
+    min-height: 1.4em;
+    text-align: center;
+    font-weight: 600;
+    color: var(--acc);
+  }
+  [hidden] { display: none !important; }
 </style>
-</head>
-<body class="min-h-screen bg-[#f3f5f7] dark:bg-[#10171d] text-[#14202b] dark:text-[#e6edf2] font-sans antialiased flex flex-col items-center">
+<script src="/_aistudio-iframe.js?v=1f94f900"></script></head>
+<body>
 
-<main class="w-full max-w-[640px] px-3.5 sm:px-4 py-3 sm:py-5 flex flex-col flex-1">
-  <!-- 1. Antet -->
-  <header class="flex items-center justify-between gap-2 mb-3">
-    <div class="flex items-center gap-2 min-w-0">
-      <div class="w-8 h-8 rounded-lg bg-[#0b6e8a] dark:bg-[#4cb8d6] flex items-center justify-center text-white dark:text-[#06232d] shadow-sm font-bold text-base flex-shrink-0">
-        ▶
-      </div>
-      <h1 class="text-base sm:text-lg font-bold truncate">
-        Citește clipboard <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-[#0b6e8a]/20 text-[#0b6e8a] dark:text-[#4cb8d6]">v2</span>
-      </h1>
+<main>
+  <!-- 1. Antet cu Titlu v2, Șterge și Help -->
+  <header>
+    <div class="title-group">
+      <div class="app-icon">▶</div>
+      <h1>Citește clipboard <span class="v2-badge">v2</span></h1>
     </div>
-
-    <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-      <button id="clear" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-[#d5dde3] dark:border-[#2b3a45] bg-white dark:bg-[#18222a] hover:bg-black/5 dark:hover:bg-white/5 transition" aria-label="Șterge textul">
-        <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-        <span>Șterge</span>
+    <div class="header-actions">
+      <button id="clear" type="button" class="btn-sm" aria-label="Șterge textul">
+        <span>🗑 Șterge</span>
       </button>
-
-      <button id="help" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-[#d5dde3] dark:border-[#2b3a45] bg-white dark:bg-[#18222a] hover:bg-black/5 dark:hover:bg-white/5 transition" aria-expanded="false">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3m0 4h.01"/></svg>
-        <span>Help</span>
+      <button id="help" type="button" class="btn-sm" aria-expanded="false">
+        <span>? Help</span>
       </button>
     </div>
   </header>
 
   <!-- Help Accordion Box -->
-  <div id="helpbox" class="hidden bg-white dark:bg-[#18222a] border border-[#d5dde3] dark:border-[#2b3a45] rounded-xl p-3.5 mb-3 text-xs sm:text-sm text-[#14202b] dark:text-[#e6edf2] shadow-sm">
-    <h2 class="font-bold text-sm mb-1.5 text-[#0b6e8a] dark:text-[#4cb8d6]">Instrucțiuni de utilizare (v2)</h2>
-    <ol class="list-decimal pl-5 space-y-1 mb-2.5 text-[#5b6b78] dark:text-[#93a4b1]">
+  <div id="helpbox" hidden>
+    <h2>Instrucțiuni de utilizare (v2)</h2>
+    <ol>
       <li><b>Text sau Link</b>: lipește un articol sau URL direct în casetă.</li>
-      <li><b>Listă (linkuri și texte)</b>: poți partaja (Share) din Chrome, WhatsApp sau Notes atât linkuri, cât și texte selectate direct în listă.</li>
+      <li><b>Listă (linkuri și texte)</b>: poți partaja (Share) din Chrome, WhatsApp sau Notes atât linkuri cât și texte selectate direct în listă.</li>
       <li><b>Controale de redare sus</b>: butoanele Start, Pauză, Skip și Stop sunt plasate direct sub taburi.</li>
       <li><b>Viteză</b>: reglează viteza din slider sau scurtăturile rapide (1.0×, 1.2×, 1.5×, 1.8×, 2.0×).</li>
       <li><b>Skip (⏭)</b>: sare instant la următorul articol din listă (sau sare 5 propoziții).</li>
     </ol>
-    <h2 class="font-bold text-sm mb-1.5 text-[#0b6e8a] dark:text-[#4cb8d6]">Estimare timp de lectură</h2>
-    <ul class="list-disc pl-5 space-y-1 text-[#5b6b78] dark:text-[#93a4b1]">
+    <h2>Estimare timp de lectură</h2>
+    <ul>
       <li><b>Citire vizuală</b>: în gând, calculat la circa 220 de cuvinte/minut.</li>
       <li><b>Audio</b>: timpul la viteza aleasă (baza vocală este ~155 cuv/min la 1.0×).</li>
       <li><b>Economie / Mai lent</b>: diferența de timp economisit sau adăugat.</li>
@@ -84,92 +492,87 @@
   </div>
 
   <!-- 2. Navigare Taburi: Text/Link vs Listă -->
-  <div id="tabs" class="grid grid-cols-2 gap-2 mb-2.5">
-    <button id="m1" type="button" class="min-h-[42px] flex items-center justify-center gap-2 rounded-xl font-semibold text-sm border bg-[#0b6e8a] text-white border-[#0b6e8a] shadow-sm transition">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <span>Text / Link</span>
+  <div id="tabs">
+    <button id="m1" type="button" class="tab-btn on">
+      <span>📄 Text / Link</span>
     </button>
-    <button id="m2" type="button" class="min-h-[42px] flex items-center justify-center gap-2 rounded-xl font-semibold text-sm border bg-white dark:bg-[#18222a] border-[#d5dde3] dark:border-[#2b3a45] text-[#5b6b78] dark:text-[#93a4b1] hover:bg-black/5 dark:hover:bg-white/5 transition">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
-      <span>Listă (0)</span>
+    <button id="m2" type="button" class="tab-btn">
+      <span>📋 Listă (0)</span>
     </button>
   </div>
 
-  <!-- 3. CONTROALELE DE REDARE + VITEZA + POZIȚIA (CARD MODERN IMEDIAT SUB TABURI) -->
-  <div class="bg-white dark:bg-[#18222a] border border-[#d5dde3] dark:border-[#2b3a45] rounded-xl p-3 shadow-sm mb-3">
+  <!-- 3. CONTROALELE DE REDARE + VITEZA + POZIȚIA (IMEDIAT SUB TABURI) -->
+  <div class="control-card">
     <!-- Rândul de butoane: Start, Pauză, Skip, Stop -->
-    <div class="grid grid-cols-4 gap-2 mb-3">
-      <button id="play" type="button" class="min-h-[50px] flex flex-col items-center justify-center gap-0.5 rounded-xl bg-[#0b6e8a] hover:bg-[#085369] active:scale-95 text-white font-bold text-xs sm:text-sm shadow-sm transition">
-        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <div class="main-controls">
+      <button id="play" type="button" class="ctrl-btn btn-play" title="Pornește lectura">
+        <span style="font-size:1.15rem">▶</span>
         <span>Start</span>
       </button>
 
-      <button id="pause" type="button" class="min-h-[50px] flex flex-col items-center justify-center gap-0.5 rounded-xl bg-white dark:bg-[#18222a] hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 border border-[#d5dde3] dark:border-[#2b3a45] font-bold text-xs sm:text-sm shadow-sm transition">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      <button id="pause" type="button" class="ctrl-btn" title="Pauză sau Reia">
+        <span style="font-size:1.15rem">⏸</span>
         <span>Pauză</span>
       </button>
 
-      <button id="skip" type="button" class="min-h-[50px] flex flex-col items-center justify-center gap-0.5 rounded-xl bg-white dark:bg-[#18222a] hover:bg-amber-50 dark:hover:bg-amber-950/20 active:scale-95 border border-[#d5dde3] dark:border-[#2b3a45] text-amber-700 dark:text-amber-400 font-bold text-xs sm:text-sm shadow-sm transition" title="Sari peste articolul curent sau 5 propoziții">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+      <button id="skip" type="button" class="ctrl-btn btn-skip" title="Sari peste articolul curent sau 5 propoziții">
+        <span style="font-size:1.15rem">⏭</span>
         <span>Skip</span>
       </button>
 
-      <button id="stop" type="button" class="min-h-[50px] flex flex-col items-center justify-center gap-0.5 rounded-xl bg-white dark:bg-[#18222a] hover:bg-red-50 dark:hover:bg-red-950/20 active:scale-95 border border-red-200 dark:border-red-900/40 text-[#b3372b] dark:text-[#e5675b] font-bold text-xs sm:text-sm shadow-sm transition">
-        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+      <button id="stop" type="button" class="ctrl-btn btn-stop" title="Oprește și revino la început">
+        <span style="font-size:1.15rem">⏹</span>
         <span>Stop</span>
       </button>
     </div>
 
     <!-- Secțiunea Viteză -->
-    <div class="pt-2 border-t border-[#d5dde3]/70 dark:border-[#2b3a45]/70">
-      <div class="flex justify-between items-center text-xs font-semibold text-[#5b6b78] dark:text-[#93a4b1] mb-1.5">
-        <span>Viteză redare: <span id="rv" class="font-bold text-sm text-[#0b6e8a] dark:text-[#4cb8d6]">1.0</span>×</span>
-        <div class="flex items-center gap-1">
-          <button type="button" class="preset-btn px-1.5 py-0.5 rounded text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-[#5b6b78] dark:text-[#93a4b1] hover:bg-gray-200" data-val="1.0">1.0×</button>
-          <button type="button" class="preset-btn px-1.5 py-0.5 rounded text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-[#5b6b78] dark:text-[#93a4b1] hover:bg-gray-200" data-val="1.2">1.2×</button>
-          <button type="button" class="preset-btn px-1.5 py-0.5 rounded text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-[#5b6b78] dark:text-[#93a4b1] hover:bg-gray-200" data-val="1.5">1.5×</button>
-          <button type="button" class="preset-btn px-1.5 py-0.5 rounded text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-[#5b6b78] dark:text-[#93a4b1] hover:bg-gray-200" data-val="1.8">1.8×</button>
-          <button type="button" class="preset-btn px-1.5 py-0.5 rounded text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-[#5b6b78] dark:text-[#93a4b1] hover:bg-gray-200" data-val="2.0">2.0×</button>
+    <div class="setting-row">
+      <div class="setting-header">
+        <span>Viteză redare: <span id="rv" class="val-highlight">1.0</span>×</span>
+        <div class="preset-row">
+          <button type="button" class="preset-pill active" data-val="1.0">1.0×</button>
+          <button type="button" class="preset-pill" data-val="1.2">1.2×</button>
+          <button type="button" class="preset-pill" data-val="1.5">1.5×</button>
+          <button type="button" class="preset-pill" data-val="1.8">1.8×</button>
+          <button type="button" class="preset-pill" data-val="2.0">2.0×</button>
         </div>
       </div>
-      <input id="rate" type="range" min="0.6" max="2" step="0.1" value="1" class="w-full cursor-pointer">
+      <input id="rate" type="range" min="0.6" max="2" step="0.1" value="1">
     </div>
 
     <!-- Secțiunea Poziție (Începe de la) -->
-    <div class="mt-2.5 pt-2 border-t border-[#d5dde3]/70 dark:border-[#2b3a45]/70">
-      <div class="flex justify-between items-center text-xs font-semibold text-[#5b6b78] dark:text-[#93a4b1] mb-1">
+    <div class="setting-row">
+      <div class="setting-header">
         <span>Începe de la:</span>
-        <span id="pv" class="text-[#0b6e8a] dark:text-[#4cb8d6]">–</span>
+        <span id="pv" class="val-highlight">–</span>
       </div>
-      <input id="pos" type="range" min="0" max="0" step="1" value="0" class="w-full cursor-pointer">
+      <input id="pos" type="range" min="0" max="0" step="1" value="0">
     </div>
   </div>
 
   <!-- 4. Textarea de introducere (Mod 1) -->
-  <textarea id="txt" rows="1" placeholder="Apasă lung aici → Lipește text sau link" class="w-full h-12 min-h-[48px] px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#18222a] text-[#14202b] dark:text-[#e6edf2] border border-[#d5dde3] dark:border-[#2b3a45] focus:outline-none focus:ring-2 focus:ring-[#0b6e8a] resize-none whitespace-nowrap overflow-hidden text-sm shadow-sm mb-2.5"></textarea>
+  <textarea id="txt" rows="1" placeholder="Apasă lung aici → Lipește text sau link"></textarea>
 
   <!-- 5. Caseta Listă articole & texte (Mod 2) -->
-  <div id="listbox" class="hidden mb-2.5 bg-white dark:bg-[#18222a] border border-[#d5dde3] dark:border-[#2b3a45] rounded-xl p-3 shadow-sm">
-    <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-[#d5dde3] dark:border-[#2b3a45]">
-      <span class="text-xs font-semibold text-[#5b6b78] dark:text-[#93a4b1] flex items-center gap-1.5">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
-        Coada de articole & texte
-      </span>
-      <div class="flex items-center gap-1.5">
-        <button id="delread" type="button" class="px-2 py-1 text-xs font-semibold rounded-lg bg-gray-100 dark:bg-gray-800 text-[#5b6b78] dark:text-[#93a4b1] hover:bg-gray-200 dark:hover:bg-gray-700 transition">Șterge citite</button>
-        <button id="delall" type="button" class="px-2 py-1 text-xs font-semibold rounded-lg bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-100 transition">Șterge tot</button>
+  <div id="listbox" hidden>
+    <div class="list-head">
+      <span>Coada de articole & texte</span>
+      <div class="list-actions">
+        <button id="delread" type="button">Șterge citite</button>
+        <button id="delall" type="button">Șterge tot</button>
       </div>
     </div>
-    <div id="items" class="max-h-[26vh] overflow-y-auto space-y-1.5"></div>
+    <div id="items"></div>
   </div>
 
   <!-- 6. Vizualizator propoziții -->
-  <div id="view" class="w-full h-[32vh] rounded-xl bg-white dark:bg-[#18222a] border border-[#d5dde3] dark:border-[#2b3a45] p-3 sm:p-4 text-sm sm:text-base leading-relaxed overflow-y-auto overflow-wrap-anywhere shadow-sm mb-2.5 select-text"></div>
+  <div id="view" hidden></div>
 
   <!-- 7. Estimare durată & status -->
-  <footer class="text-xs text-[#5b6b78] dark:text-[#93a4b1] space-y-1">
-    <div id="dur" class="p-2.5 rounded-lg bg-black/5 dark:bg-white/5 border border-[#d5dde3]/60 dark:border-[#2b3a45]/60 font-medium">Citire vizuală: – · Audio: –</div>
-    <div id="msg" class="text-center font-medium text-xs text-[#0b6e8a] dark:text-[#4cb8d6] min-h-[1.4em]"></div>
+  <footer>
+    <div id="dur">Citire vizuală: – · Audio: –</div>
+    <div id="msg"></div>
   </footer>
 </main>
 
@@ -208,12 +611,9 @@ try{var s=localStorage.getItem('rate');if(s){rate.value=s;$('rv').textContent=Nu
 
 function updatePresets(){
   var curVal=Number(rate.value).toFixed(1);
-  document.querySelectorAll('.preset-btn').forEach(function(b){
+  document.querySelectorAll('.preset-pill').forEach(function(b){
     var on=Number(b.getAttribute('data-val')).toFixed(1)===curVal;
-    b.classList.toggle('bg-[#0b6e8a]', on);
-    b.classList.toggle('text-white', on);
-    b.classList.toggle('bg-gray-100', !on);
-    b.classList.toggle('dark:bg-gray-800', !on);
+    b.classList.toggle('active', on);
   });
 }
 updatePresets();
@@ -225,7 +625,7 @@ rate.oninput=function(){
   try{localStorage.setItem('rate',rate.value)}catch(e){}
 };
 
-document.querySelectorAll('.preset-btn').forEach(function(btn){
+document.querySelectorAll('.preset-pill').forEach(function(btn){
   btn.onclick=function(){
     rate.value=btn.getAttribute('data-val');
     rate.oninput();
@@ -249,14 +649,11 @@ function render(t){
   chunks.forEach(function(c,i){
     var sp=document.createElement('span');
     sp.textContent=c+' ';
-    sp.className='cursor-pointer rounded px-1 py-0.5 transition-colors hover:bg-black/5 dark:hover:bg-white/5';
     sp.onclick=function(){goTo(i,true)};
     view.appendChild(sp);spans.push(sp);
   });
   idx=0;pos.max=Math.max(0,chunks.length-1);
-  if(!chunks.length){
-    view.innerHTML='<div class="h-full flex items-center justify-center text-xs sm:text-sm text-[#5b6b78] dark:text-[#93a4b1] italic text-center p-4">Lipește un articol sau un link web pentru a începe lectura audio.</div>';
-  }
+  view.hidden=!chunks.length;
   mark();
 }
 
@@ -268,20 +665,13 @@ function dur(){
   if(!chunks.length){durEl.innerHTML='Citire vizuală: – · Audio: –';return}
   var w=words(chunks),v=w/vis*60,t=w/tts*60/r,left=words(chunks.slice(idx))/tts*60/r,d=v-t;
   var diffStr=d>=1?('Economie: '+fmt(d)):d<=-1?('Mai lent cu: '+fmt(-d)):'La fel';
-  durEl.innerHTML='<div class="flex flex-wrap gap-x-2 gap-y-0.5"><span>Citire vizuală: <b>'+fmt(v)+'</b></span><span>·</span><span>Audio '+r.toFixed(1)+'×: <b>'+fmt(t)+'</b></span></div><div class="flex flex-wrap gap-x-2 gap-y-0.5 text-[#0b6e8a] dark:text-[#4cb8d6] font-semibold"><span>'+diffStr+'</span><span>·</span><span>Rămas audio: '+fmt(left)+'</span></div>';
+  durEl.innerHTML='Citire vizuală: <b>'+fmt(v)+'</b> · Audio '+r.toFixed(1)+'×: <b>'+fmt(t)+'</b><br><span style="color:var(--acc);font-weight:600">'+diffStr+' · Rămas audio: '+fmt(left)+'</span>';
 }
 
 function mark(){
   dur();
   spans.forEach(function(sp,i){
-    var cur=i===idx;
-    sp.classList.toggle('bg-[#ffe08a]', cur);
-    sp.classList.toggle('dark:bg-[#7a5f00]', cur);
-    sp.classList.toggle('text-[#222]', cur);
-    sp.classList.toggle('dark:text-white', cur);
-    sp.classList.toggle('font-semibold', cur);
-    sp.classList.toggle('ring-1', cur);
-    sp.classList.toggle('ring-yellow-400/50', cur);
+    sp.classList.toggle('cur', i===idx);
   });
   pos.value=idx;
   $('pv').textContent=chunks.length?('propoziția '+(idx+1)+' din '+chunks.length):'–';
@@ -329,7 +719,7 @@ document.addEventListener('visibilitychange',function(){
 
 function speak(){
   var my=token;
-  if(idx>=chunks.length){if(listRun){finishItem();return}state='idle';idx=0;mark();release();$('pause').querySelector('span').textContent='Pauză';say('Gata.');return}
+  if(idx>=chunks.length){if(listRun){finishItem();return}state='idle';idx=0;mark();release();$('pause').querySelector('span:last-child').textContent='Pauză';say('Gata.');return}
   mark();
   var u=new SpeechSynthesisUtterance(chunks[idx]);
   if(roVoice){u.voice=roVoice;u.lang=roVoice.lang}else u.lang='ro-RO';
@@ -348,11 +738,11 @@ function start(){
 }
 
 function pause(){
-  if(state==='playing'){token++;synth.cancel();state='paused';$('pause').querySelector('span').textContent='Reia';say('În pauză.')}
-  else if(state==='paused'){token++;$('pause').querySelector('span').textContent='Pauză';speak()}
+  if(state==='playing'){token++;synth.cancel();state='paused';$('pause').querySelector('span:last-child').textContent='Reia';say('În pauză.')}
+  else if(state==='paused'){token++;$('pause').querySelector('span:last-child').textContent='Pauză';speak()}
 }
 
-function stop(){token++;listRun=false;synth.cancel();state='idle';idx=0;mark();release();$('pause').querySelector('span').textContent='Pauză';say('Oprit.')}
+function stop(){token++;listRun=false;synth.cancel();state='idle';idx=0;mark();release();$('pause').querySelector('span:last-child').textContent='Pauză';say('Oprit.')}
 
 function skip(){
   if(mode===2&&listRun&&cur>=0){
@@ -366,7 +756,8 @@ function skip(){
 
 function note(t){
   chunks=[];spans=[];
-  view.innerHTML='<div class="h-full flex flex-col items-center justify-center text-sm text-[#5b6b78] dark:text-[#93a4b1] gap-2"><div class="w-6 h-6 border-2 border-[#0b6e8a] border-t-transparent rounded-full animate-spin"></div><span>'+t+'</span></div>';
+  view.textContent=t;
+  view.hidden=false;
   pos.max=0;mark();
 }
 
@@ -409,7 +800,7 @@ async function getText(u){
 
 async function loadUrl(u){
   note('Se încarcă articolul…');
-  var t;try{t=await getText(u)}catch(e){view.innerHTML='<div class="h-full flex items-center justify-center text-sm text-red-500 text-center p-4">Nu am putut încărca linkul. Verifică internetul sau lipește textul.</div>';return}
+  var t;try{t=await getText(u)}catch(e){note('Nu am putut încărca linkul. Verifică conexiunea la internet sau lipește textul.');return}
   txt.value=t;render();
 }
 
@@ -430,31 +821,26 @@ function renderList(){
   items.forEach(function(it,i){
     var d=document.createElement('div');
     var isCurrent=listRun&&i===cur;
-    d.className='flex items-center justify-between gap-2 px-3 py-2 rounded-lg border transition ' +
-      (isCurrent ? 'bg-[#ffe08a] text-[#222] border-yellow-400 font-semibold' :
-       it.read ? 'opacity-60 bg-gray-50/50 dark:bg-gray-800/20 border-transparent' :
-       'bg-white dark:bg-[#18222a] border-[#d5dde3] dark:border-[#2b3a45]');
+    d.className='list-item' + (isCurrent ? ' now' : it.read ? ' rd' : '');
 
     var t=document.createElement('span');
-    t.className='text-left flex-1 min-w-0 flex items-center gap-2 text-xs sm:text-sm truncate cursor-pointer';
+    t.className='list-item-title';
     var label=it.title||(it.type==='text'?it.text.slice(0,60):it.url.replace(/^https?:\/\/(www\.)?/,'').slice(0,60));
     var badgeType=it.type==='text'?'Text':'Link';
-    t.innerHTML=(it.read?'<span class="text-green-600 font-bold">✓</span> ':it.err?'<span class="text-red-500 font-bold">⚠</span> ':isCurrent?'<span class="w-2 h-2 rounded-full bg-amber-700 animate-ping"></span> ':'<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> ')+
-      '<span class="truncate">'+label+'</span>'+
-      '<span class="text-[10px] px-1.5 py-0.5 rounded uppercase font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 ml-auto">'+badgeType+'</span>';
+    t.innerHTML=(it.read?'✓ ':it.err?'⚠ ':isCurrent?'▶ ':'• ')+label+'<span class="badge-tag">'+badgeType+'</span>';
     t.onclick=function(){startList(i)};
 
     var x=document.createElement('button');
     x.type='button';
-    x.className='p-1 rounded text-gray-400 hover:text-red-500 hover:bg-black/5 dark:hover:bg-white/5 transition';
-    x.innerHTML='✕';
+    x.className='del-item';
+    x.textContent='✕';
     x.setAttribute('aria-label','Șterge din listă');
     x.onclick=function(e){e.stopPropagation();if(listRun&&i===cur)stop();items.splice(i,1);save();renderList()};
 
     d.appendChild(t);d.appendChild(x);box.appendChild(d);
   });
-  if(!items.length)box.innerHTML='<div class="py-6 text-center text-xs text-[#5b6b78] dark:text-[#93a4b1]">Lista e goală. Distribuie un link sau text din altă aplicație către „Citește clipboard”.</div>';
-  $('m2').querySelector('span').textContent='Listă ('+items.filter(function(it){return !it.read}).length+')';
+  if(!items.length)box.innerHTML='<div style="padding:16px 0;text-align:center;color:var(--mut);font-size:0.8rem">Lista e goală. Distribuie un link sau text din altă aplicație către „Citește clipboard”.</div>';
+  $('m2').querySelector('span').textContent='📋 Listă ('+items.filter(function(it){return !it.read}).length+')';
 }
 
 function startList(from){
@@ -480,24 +866,20 @@ async function playItem(i){
 
 function playNext(){
   for(var j=cur+1;j<items.length;j++)if(!items[j].read&&!items[j].err){playItem(j);return}
-  listRun=false;state='idle';release();$('pause').querySelector('span').textContent='Pauză';renderList();say('Lista a fost citită.');
+  listRun=false;state='idle';release();$('pause').querySelector('span:last-child').textContent='Pauză';renderList();say('Lista a fost citită.');
 }
 
 function finishItem(){if(items[cur]){items[cur].read=true;save()}renderList();playNext()}
 
 function setMode(m){
   stop();mode=m;
-  $('m1').className = m===1 ?
-    'min-h-[42px] flex items-center justify-center gap-2 rounded-xl font-semibold text-sm border bg-[#0b6e8a] text-white border-[#0b6e8a] shadow-sm transition' :
-    'min-h-[42px] flex items-center justify-center gap-2 rounded-xl font-semibold text-sm border bg-white dark:bg-[#18222a] border-[#d5dde3] dark:border-[#2b3a45] text-[#5b6b78] dark:text-[#93a4b1] hover:bg-black/5 dark:hover:bg-white/5 transition';
-  $('m2').className = m===2 ?
-    'min-h-[42px] flex items-center justify-center gap-2 rounded-xl font-semibold text-sm border bg-[#0b6e8a] text-white border-[#0b6e8a] shadow-sm transition' :
-    'min-h-[42px] flex items-center justify-center gap-2 rounded-xl font-semibold text-sm border bg-white dark:bg-[#18222a] border-[#d5dde3] dark:border-[#2b3a45] text-[#5b6b78] dark:text-[#93a4b1] hover:bg-black/5 dark:hover:bg-white/5 transition';
+  $('m1').classList.toggle('on', m===1);
+  $('m2').classList.toggle('on', m===2);
 
-  txt.classList.toggle('hidden', m===2);
-  $('listbox').classList.toggle('hidden', m!==2);
-  $('clear').classList.toggle('hidden', m===2);
-  view.style.height=m===2?'25vh':'32vh';
+  txt.hidden = m===2;
+  $('listbox').hidden = m!==2;
+  $('clear').hidden = m===2;
+  view.style.height = m===2 ? '24vh' : '32vh';
 
   var v=txt.value.trim();
   if(m===1&&v&&!/^https?:\/\/\S+$/i.test(v))render();else render('');
@@ -517,7 +899,7 @@ txt.addEventListener('input',function(){
 });
 
 $('clear').onclick=function(){stop();clearTimeout(tm);txt.value='';chunks=[];render();txt.focus()};
-$('help').onclick=function(){var h=$('helpbox');h.classList.toggle('hidden');$('help').setAttribute('aria-expanded',String(!h.classList.contains('hidden')))};
+$('help').onclick=function(){var h=$('helpbox');h.hidden=!h.hidden;$('help').setAttribute('aria-expanded',String(!h.hidden))};
 $('m1').onclick=function(){setMode(1)};
 $('m2').onclick=function(){setMode(2)};
 $('delread').onclick=function(){if(listRun)stop();items=items.filter(function(it){return !it.read});save();renderList()};
