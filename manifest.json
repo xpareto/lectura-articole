@@ -1,9 +1,9 @@
 {
-  "id": "lectura-audio-v4",
-  "name": "Lectură articole v4",
-  "short_name": "Lectură v4",
+  "id": "lectura-audio-v5",
+  "name": "Lectură articole v5",
+  "short_name": "Lectură v5",
   "description": "citește articole de la linkuri sau clipboard",
-  "start_url": "./?v=4",
+  "start_url": "./index.html?v=5",
   "scope": "./",
   "display": "standalone",
   "background_color": "#FFFFFF",
@@ -24,7 +24,7 @@
     }
   ],
   "share_target": {
-    "action": "./",
+    "action": "./index.html",
     "method": "GET",
     "params": {
       "title": "title",
